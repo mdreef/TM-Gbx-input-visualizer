@@ -22,24 +22,26 @@ Usage: ./visualize.py [OPTION]... [FILE]...
 def fname_from_gbx(gbx_fname, repl):
     return os.path.basename(gbx_fname).replace('.Replay.Gbx', repl)
 
-def plot_stepfill(axis, x, y, color):
-    axis.step(x, y, where='post', color=color)
-    axis.fill_between(x, y, step='post', alpha=0.3, color=color)
+def plot_stepfill(axis, x, y, color, border=True, alpha=0.3):
+    if border:
+        axis.step(x, y, where='post', color=color)
+    axis.fill_between(x, y, step='post', alpha=alpha, color=color)
 
 # Plot inputs
 def plot_inputs(axis, inputs, label=''):
+    plot_stepfill(axis, inputs['brake'][:,0]/1000, -inputs['brake'][:,1]*80000, u'#ff7f0e', border=False)
+    plot_stepfill(axis, inputs['accel'][:,0]/1000,  inputs['accel'][:,1]*80000, u'#2ca02c', border=False)
     plot_stepfill(axis, inputs['steerR'][:,0]/1000, inputs['steerR'][:,1], u'#1f77b4')
     plot_stepfill(axis, inputs['steerL'][:,0]/1000, -inputs['steerL'][:,1], u'#1f77b4')
-    plot_stepfill(axis, inputs['brake'][:,0]/1000, inputs['brake'][:,1]*32768, u'#ff7f0e')
-    plot_stepfill(axis, inputs['accel'][:,0]/1000, (inputs['accel'][:,1]-1)*32768, u'#2ca02c')
     axis.set_xlim(-2.5, inputs['racetime']/1000)
-    axis.set_ylim(-65536, 65536)
+    axis.set_ylim(-80000, 80000) #65536
     axis.grid()
     axis.set_title(label, fontsize='small', loc='left')
 
     axis.xaxis.set_major_locator(MultipleLocator(1))
     #axis.xaxis.set_minor_locator(MultipleLocator(0.1))
-    axis.set_yticks([-32768,0,32768])
+    axis.yaxis.set_major_locator(MultipleLocator(32768))
+    #axis.set_yticks([-32768,0,32768])
     axis.set_yticklabels([])
 
 # Plot ms inputs
